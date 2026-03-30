@@ -1,3 +1,7 @@
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField
+from wtforms.validators import DataRequired, Length, Optional
+
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -59,12 +63,23 @@ class EventForm(FlaskForm):
     date = DateTimeField('Date', validators=[DataRequired()], format='%Y-%m-%dT%H:%M')
     location = StringField('Location')
     submit = SubmitField('Save Event')
+    category_id = SelectField(
+        'Category',
+        coerce=int,
+        validators=[Optional()]
+    )
 
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Phone')
     submit = SubmitField('Save Contact')
+    
+class CategoryForm(FlaskForm):
+    name = StringField(
+        'Category Name',
+        validators=[DataRequired(), Length(max=100)]
+    )
 
 # Routes
 @app.route('/')
@@ -81,6 +96,7 @@ def index():
 @app.route('/events/new', methods=['GET', 'POST'])
 def create_event():
     form = EventForm()
+    form.category_id.choices = [(c.id, c.name) for c in Category.query.all()]
     if form.validate_on_submit():
         try:
             event = Event(
