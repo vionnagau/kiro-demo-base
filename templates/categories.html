@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>All Categories</h2>
+  <ul>
+    {% for category in categories %}
+      <li>{{ category.name }}</li>
+    {% else %}
+      <li>No categories yet.</li>
+    {% endfor %}
+  </ul>
+  <p><a href="{{ url_for('new_category') }}">Add New Category</a></p>
+{% endblock %}

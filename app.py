@@ -211,6 +211,22 @@ def respond_invitation(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
+    
+@app.route('/categories')
+def categories():
+    all_categories = Category.query.all()
+    return render_template('categories.html', categories=all_categories)
+
+@app.route('/categories/new', methods=['GET', 'POST'])
+def new_category():
+    form = CategoryForm()
+    if form.validate_on_submit():
+        category = Category(name=form.name.data)
+        db.session.add(category)
+        db.session.commit()
+        flash('Category created successfully!', 'success')
+        return redirect(url_for('categories'))
+    return render_template('category_form.html', form=form)
 
 def initialize_database():
     """Initialize database with tables and default data."""
